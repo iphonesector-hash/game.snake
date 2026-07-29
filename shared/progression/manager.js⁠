@@ -1,0 +1,39 @@
+export class ProgressionManager {
+  constructor() {
+    this.data = this.load();
+  }
+
+  load() {
+    try {
+      const saved = localStorage.getItem('lovehub_player');
+      return saved ? JSON.parse(saved) : { xp: 0, coins: 0, highScore: 0 };
+    } catch {
+      return { xp: 0, coins: 0, highScore: 0 };
+    }
+  }
+
+  save() {
+    localStorage.setItem('lovehub_player', JSON.stringify(this.data));
+  }
+
+  awardXP(amount) {
+    this.data.xp += amount;
+    this.save();
+    return this.data.xp;
+  }
+
+  awardCoins(amount) {
+    this.data.coins += amount;
+    this.save();
+    return this.data.coins;
+  }
+
+  updateHighScore(score) {
+    if (score > this.data.highScore) {
+      this.data.highScore = score;
+      this.save();
+    }
+  }
+}
+
+export default ProgressionManager;
