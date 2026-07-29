@@ -1,0 +1,77 @@
+export class SnakeEngine {
+  constructor() {
+    this.tileCount = 25;
+    this.snake = [{ x: 12, y: 12 }];
+    this.direction = { x: 1, y: 0 };
+    this.nextDirection = { x: 1, y: 0 };
+    this.food = { x: 5, y: 5 };
+    this.score = 0;
+    this.gameOver = false;
+  }
+
+  setDirection(dx, dy) {
+    // جلوگیری از حرکت معکوس
+    if (this.direction.x === -dx && this.direction.y === -dy) return;
+    this.nextDirection = { x: dx, y: dy };
+  }
+
+  update() {
+    if (this.gameOver) return;
+
+    this.direction = { ...this.nextDirection };
+
+    const head = {
+      x: this.snake[0].x + this.direction.x,
+      y: this.snake[0].y + this.direction.y
+    };
+
+    // برخورد با دیوار
+    if (
+      head.x < 0 || head.x >= this.tileCount ||
+      head.y < 0 || head.y >= this.tileCount
+    ) {
+      this.gameOver = true;
+      return;
+    }
+
+    // برخورد با خودش
+    for (let segment of this.snake) {
+      if (segment.x === head.x && segment.y === head.y) {
+        this.gameOver = true;
+        return;
+      }
+    }
+
+    this.snake.unshift(head);
+
+    // خوردن غذا
+    if (head.x === this.food.x && head.y === this.food.y) {
+      this.score += 10;
+      this.generateFood();
+    } else {
+      this.snake.pop();
+    }
+  }
+
+  generateFood() {
+    let newFood;
+    do {
+      newFood = {
+        x: Math.floor(Math.random() * this.tileCount),
+        y: Math.floor(Math.random() * this.tileCount)
+      };
+    } while (this.snake.some(s => s.x === newFood.x && s.y === newFood.y));
+    this.food = newFood;
+  }
+
+  reset() {
+    this.snake = [{ x: 12, y: 12 }];
+    this.direction = { x: 1, y: 0 };
+    this.nextDirection = { x: 1, y: 0 };
+    this.score = 0;
+    this.gameOver = false;
+    this.generateFood();
+  }
+}
+
+export default SnakeEngine;
