@@ -1,0 +1,71 @@
+import SnakeEngine from './engine/core.js';
+import SnakeRenderer from './renderer/canvas.js';
+import InputManager from '../../shared/input/manager.js';
+import ProgressionManager from '../../shared/progression/manager.js';
+import AudioManager from '../../shared/audio/manager.js';
+
+class LoveHubSnake {
+  constructor() {
+    this.engine = new SnakeEngine();
+    this.renderer = null;
+    this.input = new InputManager();
+    this.progression = new ProgressionManager();
+    this.audio = new AudioManager();
+    this.lastTime = 0;
+    this.speed = 140; // میلی‌ثانیه بین هر حرکت
+    this.running = false;
+  }
+
+  init(container) {
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = 500;
+    this.canvas.height = 500;
+    this.canvas.className = 'snake-canvas';
+    container.appendChild(this.canvas);
+
+    this.renderer = new SnakeRenderer(this.canvas);
+    this.input.init(this.canvas);
+
+    this.input.on('moveUp', () => this.engine.setDirection(0, -1));
+    this.input.on('moveDown', () => this.engine.setDirection(0, 1));
+    this.input.on('moveLeft', () => this.engine.setDirection(-1, 0));
+    this.input.on('moveRight', () => this.engine.setDirection(1, 0));
+    this.input.on('restart', () => this.restart());
+  }
+
+  start() {
+    this.running = true;
+    this.lastTime = performance.now();
+    this.loop(this.lastTime);
+  }
+
+  loop(timestamp) {
+    if (!this.running) return;
+
+    if (timestamp - this.lastTime >= this.speed) {
+      this.engine.update();
+
+      if (this.engine.gameOver) {
+        this.progression.updateHighScore(this.engine.score);
+        this.progression.awardXP(Math.floor(this.engine.score / 5));
+        this.audio.play('gameover');
+      }
+
+      this.lastTime = timestamp;
+    }
+
+    this.renderer.clear();
+    this.renderer.drawSnake(this.engine.snake);
+    this.renderer.drawFood(this.engine.food);
+    this.renderer.drawUI(this.engine.score, this.engine.gameOver);
+
+    requestAnimationFrame((t) => this.loop(t));
+  }
+
+  restart() {
+    this.engine.reset();
+    this.audio.play('restart');
+  }
+}
+
+export default LoveHubSnake;
