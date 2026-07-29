@@ -1,0 +1,21 @@
+---
+
+### 4. `shared/game-api.js`
+
+```js
+export const GameAPI = {
+  init(container) {
+    console.log('GameAPI initialized');
+  },
+  start() {
+    console.log('Game started');
+  },
+  pause() {},
+  resume() {},
+  destroy() {},
+  getStats() {
+    return { score: 0, level: 1, xpGained: 0 };
+  }
+};
+
+export default GameAPI;
