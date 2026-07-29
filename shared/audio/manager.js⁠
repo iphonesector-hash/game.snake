@@ -1,0 +1,16 @@
+export class AudioManager {
+  constructor() {
+    this.enabled = true;
+  }
+
+  play(name) {
+    if (!this.enabled) return;
+    console.log(`🔊 ${name}`);
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+  }
+}
+
+export default AudioManager;
